@@ -37,7 +37,7 @@ fn create_pubkey() -> RSAPublicKey {
             data
         });
     let der_bytes = base64::decode(&der_encoded).expect("failed to decode base64 content");
-    let public_key = RSAPublicKey::from_pkcs1(&der_bytes).expect("failed to parse key");
+    let public_key = RSAPublicKey::from_pkcs8(&der_bytes).expect("failed to parse key");
     return public_key;
 }
 
