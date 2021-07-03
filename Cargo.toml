@@ -1,3 +1,4 @@
+cargo-features = ["resolver"]
 [package]
 name = "getter"
 version = "0.1.0"
@@ -14,3 +15,4 @@ rsa = "0.4.0"
 base64 = "0.13.0"
 rand = "0.8.4"
 ureq = "2.1.1"
+iota-client = { git = "https://github.com/iotaledger/iota.rs", branch = "dev" }

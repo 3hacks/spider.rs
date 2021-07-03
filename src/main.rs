@@ -6,6 +6,7 @@ use std::io::Cursor;
 use base64;
 use rand::rngs::OsRng;
 use ureq;
+use iota_client::{Client, Result};
 
 const PUBKEY: &str = r#"-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArIEzTAaYFFzK75knVvi+
@@ -47,11 +48,22 @@ async fn send_to_ipfs(filename: &str) -> String {
     return client.add(Cursor::new(enc_data)).await.expect("Failed to add file to IPFS").hash;
 }
 
-fn send_request(base_uri: &str, ipfs_hash: &str) {
-    let url = base_uri.to_owned() + "/" + ipfs_hash;
-    let _ = ureq::get(&url).call();
+async fn send_ipfs_hash(ipfs_hash: &str) {
+    let iota = Client::builder()
+        .with_node("https://chrysalis-nodes.iota.org").expect("IOTA node is unavailable.")
+        .finish()
+        .await.expect("IOTA node is unavailable.");
+    println!("new");
+    let message = iota
+        .message()
+        .with_index("3hacks")
+        .with_data(ipfs_hash.as_bytes().to_vec())
+        .finish()
+        .await.expect("Failed to send message to IOTA.");
+    println!("done");
 }
 #[tokio::main]
 async fn main() {
-    println!("{}", send_to_ipfs("hello.txt").await);
+    let ipfs_hash = send_to_ipfs("hello.txt").await;
+    send_ipfs_hash(&ipfs_hash).await;
 }
