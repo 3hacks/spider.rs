@@ -5,6 +5,7 @@ use rsa::{PublicKey, RSAPublicKey, PaddingScheme};
 use std::io::Cursor;
 use base64;
 use rand::rngs::OsRng;
+use ureq;
 
 const PUBKEY: &str = r#"-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArIEzTAaYFFzK75knVvi+
@@ -44,6 +45,11 @@ async fn send_to_ipfs(filename: &str) -> String {
     let client = IpfsClient::build_with_base_uri(uri);
     let enc_data = encrypt(filename);
     return client.add(Cursor::new(enc_data)).await.expect("Failed to add file to IPFS").hash;
+}
+
+fn send_request(base_uri: &str, ipfs_hash: &str) {
+    let url = base_uri.to_owned() + "/" + ipfs_hash;
+    let _ = ureq::get(&url).call();
 }
 #[tokio::main]
 async fn main() {
