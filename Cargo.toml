@@ -1,6 +1,5 @@
-cargo-features = ["resolver"]
 [package]
-name = "getter"
+name = "spider"
 version = "0.1.0"
 authors = ["lucky <takuto.yoshikai@gmail.com>"]
 edition = "2018"
@@ -11,8 +10,10 @@ edition = "2018"
 ipfs-api = "0.11.0"
 tokio = { version = "1.8.0", features = ["full"] }
 http = "0.2.3"
-rsa = "0.4.0"
 base64 = "0.13.0"
 rand = "0.8.4"
-ureq = "2.1.1"
 iota-client = { git = "https://github.com/iotaledger/iota.rs", branch = "dev" }
+sha2 = "0.9.5"
+bytebuffer = "0.2.1"
+aes = "0.3.2"
+block-modes = "0.3.3"
