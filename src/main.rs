@@ -1,8 +1,6 @@
 use ipfs_api::IpfsClient;
-use std::fs::File;
 use ipfs_api::TryFromUri;
 use http::Uri;
-use std::error::Error;
 use rsa::{PublicKey, RSAPublicKey, PaddingScheme};
 use std::io::Cursor;
 use base64;
@@ -24,7 +22,7 @@ fn encrypt(filename: &str) -> Vec<u8> {
     //let mut file = File::open(filename).expect("Failed to open the file");
     //let mut buf = Vec::new();
     //let _ = file.read_to_end(&mut buf).expect("Failed to load the file");
-    let mut buf = std::fs::read(filename).expect("Failed to load the file");
+    let buf = std::fs::read(filename).expect("Failed to load the file");
     let enc_data = pubkey.encrypt(&mut rng, PaddingScheme::PKCS1v15Encrypt, &buf).expect("Failed to encrypt the data");
     return enc_data;
 }
@@ -44,7 +42,7 @@ fn create_pubkey() -> RSAPublicKey {
 async fn send_to_ipfs(filename: &str) -> String {   
     let uri = "https://ipfs.infura.io:5001/api/v0".parse::<Uri>().unwrap();
     let client = IpfsClient::build_with_base_uri(uri);
-    let enc_data = encrypt("hello.txt");
+    let enc_data = encrypt(filename);
     return client.add(Cursor::new(enc_data)).await.expect("Failed to add file to IPFS").hash;
 }
 #[tokio::main]
