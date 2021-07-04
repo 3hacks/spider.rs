@@ -4,5 +4,5 @@ spider is a rust library to upload encrypted file on IPFS network, and sharing t
 **Cargo.toml**
 ```toml
 [dependencies]
-spider = { git = "https://github.com/3hacks/spider.git" }
+spider = { git = "https://github.com/TakutoYoshikai/spider.rs.git" }
 ```
