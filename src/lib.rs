@@ -1,4 +1,3 @@
-use std::env;
 use std::io::Write;
 use std::io;
 use aes::Aes256;
@@ -23,14 +22,14 @@ fn encrypt(filename: &str) -> String {
 }
 
 
-async fn send_to_ipfs(filename: &str) -> String {   
+pub async fn send_to_ipfs(filename: &str) -> String {   
     let uri = "https://ipfs.infura.io:5001/api/v0".parse::<Uri>().unwrap();
     let client = IpfsClient::build_with_base_uri(uri);
     let enc_data = encrypt(filename);
     return client.add(Cursor::new(enc_data)).await.expect("Failed to add file to IPFS").hash;
 }
 
-async fn send_ipfs_hash(ipfs_hash: &str) {
+pub async fn send_ipfs_hash(ipfs_hash: &str) {
     println!("start IOTA");
     let iota = Client::builder()
         .with_node("https://chrysalis-nodes.iota.org").expect("IOTA node is unavailable.")
@@ -65,7 +64,7 @@ fn encrypt_data(key: &str, data: &[u8]) -> String {
     base64::encode(buffer.to_bytes())
 }
 
-fn decrypt(filename: &str) {
+pub fn decrypt(filename: &str) {
     let content = std::fs::read_to_string(filename).expect("Failed to load encrypted file.");
     let buf = decrypt_data(PASSWORD, &content);
     let mut writer = io::BufWriter::new(io::stdout());
@@ -75,17 +74,4 @@ fn decrypt_data(key: &str, data: &str) -> Vec<u8> {
     let bytes = base64::decode(data).unwrap();
     let cipher = AesCbc::new_var(key.as_bytes(), &bytes[0..16]).unwrap();
     cipher.decrypt_vec(&bytes[16..]).unwrap()
-}
-#[tokio::main]
-async fn main() {
-    let args: Vec<String> = env::args().collect();
-    let command = &args[1];
-    let target = &args[2];
-    if command == "send" {
-        let ipfs_hash = send_to_ipfs(&target).await;
-        send_ipfs_hash(&ipfs_hash).await;
-    }
-    if command == "receive" {
-        decrypt(&target);
-    }
 }
