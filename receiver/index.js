@@ -25,7 +25,6 @@ async function run() {
     }).reduce((a, b) => {
       return a + b;
     });
-    //console.log(index);
     if (index === INDEX) {
       console.log(index);
       const data = payload.data.data.map((n) => {
