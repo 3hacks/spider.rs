@@ -13,23 +13,22 @@ use std::io::Cursor;
 use base64;
 use iota_client::{Client};
 const BASE_STR: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-const PASSWORD: &str = "SxRzGTuW5PbDLOoSv2up+whMRLBLqSz8";
 
-fn encrypt(filename: &str) -> String {
+fn encrypt(filename: &str, password: &str) -> String {
     let buf = std::fs::read(filename).expect("Failed to load the file");
-    let enc_data = encrypt_data(PASSWORD, &buf);
+    let enc_data = encrypt_data(password, &buf);
     return enc_data;
 }
 
 
-pub async fn send_to_ipfs(filename: &str) -> String {   
+pub async fn send_to_ipfs(filename: &str, password: &str) -> String {   
     let uri = "https://ipfs.infura.io:5001/api/v0".parse::<Uri>().unwrap();
     let client = IpfsClient::build_with_base_uri(uri);
-    let enc_data = encrypt(filename);
+    let enc_data = encrypt(filename, password);
     return client.add(Cursor::new(enc_data)).await.expect("Failed to add file to IPFS").hash;
 }
 
-pub async fn send_ipfs_hash(ipfs_hash: &str) {
+pub async fn send_ipfs_hash(ipfs_hash: &str, index: &str) {
     println!("start IOTA");
     let iota = Client::builder()
         .with_node("https://chrysalis-nodes.iota.org").expect("IOTA node is unavailable.")
@@ -37,7 +36,7 @@ pub async fn send_ipfs_hash(ipfs_hash: &str) {
         .await.expect("IOTA node is unavailable.");
     let _ = iota
         .message()
-        .with_index("3hacks")
+        .with_index(index)
         .with_data(ipfs_hash.as_bytes().to_vec())
         .finish()
         .await.expect("Failed to send message to IOTA.");
@@ -64,9 +63,9 @@ fn encrypt_data(key: &str, data: &[u8]) -> String {
     base64::encode(buffer.to_bytes())
 }
 
-pub fn decrypt(filename: &str) {
+pub fn decrypt(filename: &str, password: &str) {
     let content = std::fs::read_to_string(filename).expect("Failed to load encrypted file.");
-    let buf = decrypt_data(PASSWORD, &content);
+    let buf = decrypt_data(password, &content);
     let mut writer = io::BufWriter::new(io::stdout());
     writer.write(&buf).unwrap();
 }
