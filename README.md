@@ -6,3 +6,6 @@ spider is a rust library to upload encrypted file on IPFS network, and sharing t
 [dependencies]
 spider = { git = "https://github.com/TakutoYoshikai/spider.rs.git" }
 ```
+
+### License
+MIT License
